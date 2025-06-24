@@ -20,6 +20,9 @@ Thumbs.db
 # VSCode settings
 .vscode/
 
+# Slack User IDs
+src/config.py
+
 # Slack webhook safety (if you accidentally save it)
 alert_team.pyc
 
