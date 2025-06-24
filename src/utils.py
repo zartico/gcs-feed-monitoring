@@ -7,6 +7,7 @@ def extract_actual_date(filename: str) -> date | None:
     Returns a date object or None if the date cannot be extracted.
     """
     if "$folder$" in filename:
+        # Flag folders as warnings
         return None
 
     pattern = r"year=(\d{4})/month=(\d{2})/day=(\d{2})"

@@ -40,22 +40,22 @@ def analyze_feed(file_metadata: list[dict], expected_date: date) -> dict:
 
     
     # Baseline comparison
-    status = "OK"
+    status = "OK ✅"
     issues = []
 
     if today_count == 0 or today_size_mb == 0:
-        status = "CRITICAL"
+        status = "CRITICAL 🚨"
         issues.append("No data received.")
     
     else:
         if avg_count > 0 and abs(today_count - avg_count) / avg_count > 0.25:
             issues.append(f"File count deviates ≥25%: {today_count} vs baseline {avg_count:.1f}")
-            status = "WARNING"
+            status = "WARNING ❗️"
 
         if avg_size_mb > 0 and abs(today_size_mb - avg_size_mb) / avg_size_mb > 0.25:
             issues.append(f"Size deviates ≥25%: {today_size_mb:.2f} MB vs baseline {avg_size_mb:.2f} MB")
-            if status != "CRITICAL":
-                status = "WARNING"
+            if status != "CRITICAL 🚨":
+                status = "WARNING ❗️"
 
     return {
         "status": status,
