@@ -22,3 +22,7 @@ ALERT_RECIPIENTS = {
     "web": ["U01VC13DAUT", "U07A66M08CV"], # Chris, Alexis
     "media": ["U01VC13DAUT", "U07A66M08CV"], # Chris, Alexis
 }
+
+PROJECT_ID = "prj-prod-gd-api-load-t51k"
+DATASET_ID = "AziraMonitoring"
+TABLE_ID = "raw_data_monitoring"

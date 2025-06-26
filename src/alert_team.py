@@ -32,6 +32,11 @@ def format_alert_details(feed_label, result):
        lines.append("Issues Detected:")
        for issue in result['issues']:
            lines.append(f" - {issue}")
+           # Warning 
+    if result["status"] == "WARNING ❗️":
+        user_mentions = " ".join(f"<@{uid}>" for uid in ALERT_RECIPIENTS.get(feed_label, []))
+        lines.append(user_mentions)
+        lines.append(f"🚨 *CRITICAL ALERT for {feed_label}* 🚨\n{result}")
     if result["status"] == "CRITICAL 🚨":
         user_mentions = " ".join(f"<@{uid}>" for uid in ALERT_RECIPIENTS.get(feed_label, []))
         lines.append(user_mentions)

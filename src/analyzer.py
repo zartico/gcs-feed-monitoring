@@ -1,3 +1,4 @@
+from bq_client import query_historical_baseline
 from datetime import datetime, date, timedelta
 from collections import defaultdict
 
@@ -21,7 +22,7 @@ def calculate_baseline(historical_data: dict[date, list[dict]]) -> tuple[float, 
     
     return avg_count, avg_size_mb
 
-def analyze_feed(file_metadata: list[dict], expected_date: date) -> dict:
+def analyze_feed(feed_label:str, file_metadata: list[dict], expected_date: date) -> dict:
 
     # Group files by their actual date
     files_by_date = defaultdict(list)
@@ -30,8 +31,11 @@ def analyze_feed(file_metadata: list[dict], expected_date: date) -> dict:
         if actual_date:
             files_by_date[actual_date].append(file)
 
-    # Historical data for the last 30 days
-    avg_count, avg_size_mb = calculate_baseline(files_by_date)
+    # Historical data for the previous 30 days
+    end_date = expected_date - timedelta(days=1)
+    start_date = end_date - timedelta(days=31)
+    avg_count, avg_size_mb = query_historical_baseline(feed_label, start_date, end_date)
+    #avg_count, avg_size_mb = calculate_baseline(files_by_date)
     
     # Today's file delivery
     today_files = files_by_date.get(expected_date, [])
