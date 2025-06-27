@@ -6,6 +6,11 @@ from config import PROJECT_ID, DATASET_ID, TABLE_ID
 client = bigquery.Client(project = PROJECT_ID)
 
 def ensure_dataset_and_table_exist():
+    """
+    Ensure the BigQuery dataset and table exist, creating them if necessary. 
+    """
+
+    # Define dataset and table references
     dataset_ref = bigquery.DatasetReference(PROJECT_ID, DATASET_ID)
     table_ref = dataset_ref.table(TABLE_ID)
 
@@ -42,25 +47,48 @@ def upsert_feed_metrics(feed_label: str, event_date: date, file_count: int, file
         file_count (int): The number of files processed.
         file_size (float): The total size of files in MB.
     """
-
+    # Ensure dataset and table exist, if not no upsert will be performed
     table_ref = ensure_dataset_and_table_exist()
     if table_ref is None:
         print("[WARN] Skipping BigQuery insert due to missing dataset.")
         return
-
-    rows_to_insert = [{
-        "date": event_date.isoformat(),
-        "datafeed": feed_label,
-        "filesize": file_size,
-        "filecount": file_count,
-    }]
-
-    errors = client.insert_rows_json(table_ref, rows_to_insert)
     
-    if errors:
-        print(f"Error inserting rows: {errors}")
-    else:
-        print(f"Successfully upserted data for {feed_label} on {event_date}.")
+    # Prepare the MERGE query for both updating and inserting data
+    query = f"""
+    MERGE `{table_ref}` T
+    USING (
+      SELECT @event_date AS date,
+             @feed_label AS datafeed,
+             @file_count AS filecount,
+             @file_size AS filesize
+    ) S
+    ON T.date = S.date AND T.datafeed = S.datafeed
+    WHEN MATCHED THEN
+      UPDATE SET
+        T.filecount = S.filecount,
+        T.filesize = S.filesize
+    WHEN NOT MATCHED THEN
+      INSERT (date, datafeed, filecount, filesize)
+      VALUES (S.date, S.datafeed, S.filecount, S.filesize)
+    """
+
+    # Configure the query job with parameters
+    job_config = bigquery.QueryJobConfig(
+        query_parameters=[
+            bigquery.ScalarQueryParameter("event_date", "DATE", event_date.isoformat()),
+            bigquery.ScalarQueryParameter("feed_label", "STRING", feed_label),
+            bigquery.ScalarQueryParameter("file_count", "INT64", file_count),
+            bigquery.ScalarQueryParameter("file_size", "FLOAT64", file_size),
+        ]
+    )
+
+    try:
+        query_job = client.query(query, job_config=job_config)
+        query_job.result()  # Waits for job to complete
+        print(f"[INFO] MERGE complete for {feed_label} on {event_date}")
+    except Exception as e:
+        print(f"[ERROR] BigQuery MERGE failed for {feed_label} on {event_date}: {e}")
+
 
 
 def query_historical_baseline(feed_label: str, start_date: date, end_date: date):
@@ -76,12 +104,15 @@ def query_historical_baseline(feed_label: str, start_date: date, end_date: date)
         list: A list of dictionaries containing the historical data.
     """
     table_ref = f"{PROJECT_ID}.{DATASET_ID}.{TABLE_ID}"
+
+    # Query to calculate average file count and size for the specified feed label (start_date to end_date)
     query = f"""
     SELECT AVG(filecount) AS avg_count, AVG(filesize) AS avg_size
     FROM `{table_ref}`
     WHERE datafeed = @feed_label AND date BETWEEN @start_date AND @end_date
     """
     
+    # Configure the query job with parameters
     job_config = bigquery.QueryJobConfig(
         query_parameters=[
             bigquery.ScalarQueryParameter("feed_label", "STRING", feed_label),
@@ -89,34 +120,14 @@ def query_historical_baseline(feed_label: str, start_date: date, end_date: date)
             bigquery.ScalarQueryParameter("end_date", "DATE", end_date.isoformat())
         ]
     )
-    # query = """
-    # SELECT AVG(filecount) AS avg_count, AVG(filesize) AS avg_size
-    # FROM `prj-prod-gd-api-load-t51k.AziraMonitoring.raw_data_monitoring`
-    # WHERE datafeed = 'Web Impressions' AND date BETWEEN '2025-05-20' AND '2025-06-19'
-    # """
-    # job_config = bigquery.QueryJobConfig()
+
     query_job = client.query(query, job_config=job_config)
     result = query_job.result()
-    #rows = list(result)
-    #print("Rows:", rows)
 
-    print("[DEBUG] Running historical baseline query with:")
-    print("feed_label:", repr(feed_label), type(feed_label))
-    print("start_date:", repr(start_date), type(start_date))
-    print("end_date:", repr(end_date), type(end_date))  
-    print(f"  feed_label: {feed_label}")
-    print(f"  start_date: {start_date}")
-    print(f"  end_date: {end_date}")
-    print(f"  query: {query}")
-    print(f"[DEBUG] Querying table: {table_ref}")
-
-
-    #query_job = client.query(query, job_config=job_config)
-    #result = query_job.result()
     row = next(result, None)
     if row:
-        print(row[0], row[1])
-        return row[0], row[1]
+        #print(row[0], row[1])
+        return row[0], row[1] # average file count and size in MB
     else:
         print(f"[WARN] No historical data for {feed_label} between {start_date} and {end_date}")
         return 0.0, 0.0

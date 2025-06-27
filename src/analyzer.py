@@ -3,6 +3,16 @@ from datetime import datetime, date, timedelta
 from collections import defaultdict
 
 def calculate_baseline(historical_data: dict[date, list[dict]]) -> tuple[float, float]:
+    """   
+    Calculate the baseline average file count and size for the past 30 days with GCS.
+    ** Not In Use **
+    
+    Args:
+        historical_data (dict): A dictionary where keys are dates and values are lists of file metadata
+    
+    Returns:
+        tuple: A tuple containing the average file count and average file size in MB
+    """
     
     today = date.today()
     past_month = [today - timedelta(days=i + 6) for i in range(30)]
@@ -23,6 +33,17 @@ def calculate_baseline(historical_data: dict[date, list[dict]]) -> tuple[float, 
     return avg_count, avg_size_mb
 
 def analyze_feed(feed_label:str, file_metadata: list[dict], expected_date: date) -> dict:
+    """   
+    Analyze the file metadata for a specific feed and compare it against historical baselines.
+    
+    Args:
+        feed_label (str): The label of the feed to analyze.
+        file_metadata (list): List of dictionaries containing file metadata.
+        expected_date (date): The date for which the analysis is being performed.
+    
+    Returns:
+        dict: A dictionary containing the analysis result, including status, file count, size, and any issues detected.
+    """
 
     # Group files by their actual date
     files_by_date = defaultdict(list)

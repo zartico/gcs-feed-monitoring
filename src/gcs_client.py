@@ -3,8 +3,18 @@ from google.cloud import storage
 from datetime import datetime
 from utils import extract_actual_date
 
-# define function that list files in the bucket
 def list_gcs_metadata(bucket_name, prefix = "", debug = False): 
+    """
+    List files in a Google Cloud Storage bucket with metadata.
+    
+    Args:
+        bucket_name (str): The name of the GCS bucket.
+        prefix (str): Optional prefix to filter files.
+        debug (bool): If True, print debug information.
+
+    Returns:
+        list: A list of dictionaries containing file metadata.
+    """
     storage_client = storage.Client()
 
     file_list = storage_client.list_blobs(bucket_name, prefix = prefix)
@@ -31,6 +41,16 @@ def list_gcs_metadata(bucket_name, prefix = "", debug = False):
     return metadata
 
 def group_by_date(metadata):
+    """ 
+    Group file metadata by the date they were last updated.
+    ** Not In Use **
+
+    Args:
+        metadata (list): List of file metadata dictionaries.
+
+    Returns:
+        dict: A dictionary where keys are dates and values are lists of file metadata.
+    """
     grouped = {}
     for item in metadata:
         date_key = item["updated"].strftime("%Y-%m-%d")

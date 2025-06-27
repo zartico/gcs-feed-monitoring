@@ -4,6 +4,14 @@ from config import FEEDS, ALERT_RECIPIENTS
 from tabulate import tabulate
 
 def send_alert_to_team(webhook_url, alert_message):
+    """   
+    Sends an alert message to the team via a Slack webhook.
+    
+    Args:
+        webhook_url (str): The Slack webhook URL to send the alert to.
+        alert_message (str): The message to send as an alert.
+    """
+
     headers = {'Content-Type': 'application/json'}
     payload = {"text": alert_message}
 
@@ -15,12 +23,30 @@ def send_alert_to_team(webhook_url, alert_message):
 def format_overview_table(results: list[tuple[str, str, str]]) -> str:
     """
     Formats the results into a Markdown table.
+
+    Args:
+        results (list): A list of tuples containing feed label, status, and expected date.
+    
+    Returns:
+        str: A Markdown formatted table as a string.
     """
+
     header = ["Feed", "Status", "Expected Date"]
     table = tabulate(results, headers=header, tablefmt="grid", stralign="left", numalign="left")
     return f"```\n{table}\n```"
 
 def format_alert_details(feed_label, result):
+    """    
+    Formats the alert details for a specific feed into a Slack message.
+    
+    Args:
+        feed_label (str): The label of the feed.
+        result (dict): The analysis result containing status, date, file count, size, and issues.     
+    
+    Returns:
+        str: A formatted string containing the alert details.
+    """
+
     lines = [f"*Feed:* {feed_label}"]
     lines.append("\n===== ANALYSIS RESULT =====")
     lines.append(f"Status: {result['status']}")
@@ -32,11 +58,13 @@ def format_alert_details(feed_label, result):
        lines.append("Issues Detected:")
        for issue in result['issues']:
            lines.append(f" - {issue}")
-           # Warning 
+           
+    # Warning Analysis 
     if result["status"] == "WARNING ❗️":
         user_mentions = " ".join(f"<@{uid}>" for uid in ALERT_RECIPIENTS.get(feed_label, []))
         lines.append(user_mentions)
         lines.append(f"🚨 *CRITICAL ALERT for {feed_label}* 🚨\n{result}")
+    # Critical Analysis
     if result["status"] == "CRITICAL 🚨":
         user_mentions = " ".join(f"<@{uid}>" for uid in ALERT_RECIPIENTS.get(feed_label, []))
         lines.append(user_mentions)

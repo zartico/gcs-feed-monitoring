@@ -14,22 +14,36 @@ SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")
 
 def run():
 
-    actual_date = date.today() - timedelta(days=6) 
+    actual_date = date.today() - timedelta(days=6) # Analysis target date
+    upsert_start = date.today() - timedelta(days=13)  # Start date for upsert
+    upsert_end = actual_date # End date for upsert
     overview_rows = []
     alert_messages = []
     
+
+    # Single-day analysis for each feed
     for key, feed in FEEDS.items():
         print(f"\nChecking feed: {feed['label']}")
         metadata = list_gcs_metadata(feed["bucket"], feed["prefix"], debug=False)
-        result = analyze_feed(feed["label"], metadata, actual_date)
 
-        # Upsert metrics to BigQuery
-        # upsert_feed_metrics(
-        #     feed_label=feed["label"],
-        #     event_date=actual_date,
-        #     file_count=result["file_count"],
-        #     file_size=result["file_size_mb"]
-        # )
+        upsert_date = upsert_start
+        # Upsert metrics for rolling 7 day window
+        while upsert_date <= upsert_end:
+            daily_files = [f for f in metadata if f.get("actual_date") == upsert_date]
+            file_count_res = len(daily_files)
+            file_size_res = sum(f["size"] for f in daily_files) / 1_000_000 if daily_files else 0.0
+
+            # Upsert metrics to BigQuery
+            upsert_feed_metrics(
+                feed_label=feed["label"],
+                event_date=upsert_date,
+                file_count=file_count_res,
+                file_size=file_size_res
+            )
+
+            upsert_date += timedelta(days=1)
+
+        result = analyze_feed(feed["label"], metadata, actual_date)
 
         # Append to Slack overview table
         overview_rows.append((feed["label"], result["status"], result["date"]))
