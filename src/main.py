@@ -1,8 +1,8 @@
-from gcs_client import list_gcs_metadata
-from bq_client import upsert_feed_metrics
-from analyzer import analyze_feed
-from alert_team import send_alert_to_team, format_overview_table, format_alert_details
-from config import FEEDS, ALERT_RECIPIENTS
+from src.gcs_client import list_gcs_metadata
+from src.bq_client import upsert_feed_metrics
+from src.analyzer import analyze_feed
+from src.alert_team import send_alert_to_team, format_overview_table, format_alert_details
+from src.config import FEEDS, ALERT_RECIPIENTS
 from datetime import date, timedelta
 from collections import defaultdict
 from dotenv import load_dotenv

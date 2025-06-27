@@ -18,9 +18,9 @@ FEEDS = {
 }
 
 ALERT_RECIPIENTS = {
-    "geo": ["U03U54XCHB2", "U073WNX896U", "U01VC13DAUT"],    # John, Carson, Chris
-    "web": ["U01VC13DAUT", "U07A66M08CV"], # Chris, Alexis
-    "media": ["U01VC13DAUT", "U07A66M08CV"], # Chris, Alexis
+    "geo": ["U03U54XCHB2", "U073WNX896U", "U01VC13DAUT", "U01FHQJMH9C"],    # John, Carson, Chris, Eddie
+    "web": ["U01VC13DAUT", "U07A66M08CV", "U01FHQJMH9C"], # Chris, Alexis, Eddie
+    "media": ["U01VC13DAUT", "U07A66M08CV", "U01FHQJMH9C"], # Chris, Alexis, Eddie
 }
 
 PROJECT_ID = "prj-prod-gd-api-load-t51k"
