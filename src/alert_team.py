@@ -1,6 +1,6 @@
 import requests
 import json
-from config import FEEDS, ALERT_RECIPIENTS
+from src.config import FEEDS, ALERT_RECIPIENTS
 from tabulate import tabulate
 
 def send_alert_to_team(webhook_url, alert_message):
@@ -58,7 +58,7 @@ def format_alert_details(feed_label, result):
        lines.append("Issues Detected:")
        for issue in result['issues']:
            lines.append(f" - {issue}")
-           
+
     # Warning Analysis 
     if result["status"] == "WARNING ❗️":
         user_mentions = " ".join(f"<@{uid}>" for uid in ALERT_RECIPIENTS.get(feed_label, []))

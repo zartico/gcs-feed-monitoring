@@ -29,5 +29,5 @@ alert_team.pyc
 # Logs/output
 *.log
 
-# Optional: Ignore test output data
-/tests/output/
+# Pycache for tests
+tests/__pycache__/

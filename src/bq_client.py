@@ -1,7 +1,7 @@
 from google.cloud import bigquery
 from google.api_core.exceptions import NotFound
 from datetime import date 
-from config import PROJECT_ID, DATASET_ID, TABLE_ID
+from src.config import PROJECT_ID, DATASET_ID, TABLE_ID
 
 client = bigquery.Client(project = PROJECT_ID)
 

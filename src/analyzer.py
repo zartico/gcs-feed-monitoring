@@ -1,4 +1,4 @@
-from bq_client import query_historical_baseline
+from src.bq_client import query_historical_baseline
 from datetime import datetime, date, timedelta
 from collections import defaultdict
 

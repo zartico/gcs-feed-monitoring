@@ -64,7 +64,7 @@ def run():
 
     full_message = "\n".join(message_parts)
     print(full_message)
-    #send_alert_to_team(SLACK_WEBHOOK_URL, full_message)
+    send_alert_to_team(SLACK_WEBHOOK_URL, full_message)
 
 if __name__ == "__main__":
     run()
