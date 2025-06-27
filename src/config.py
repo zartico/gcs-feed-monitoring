@@ -18,8 +18,8 @@ FEEDS = {
 }
 
 ALERT_RECIPIENTS = {
-    "geo": ["U03U54XCHB2", "U073WNX896U", "U01VC13DAUT", "U01FHQJMH9C"],    # John, Carson, Chris, Eddie
-    "web": ["U01VC13DAUT", "U07A66M08CV", "U01FHQJMH9C"], # Chris, Alexis, Eddie
+    "geo": ["U03U54XCHB2", "U01VC13DAUT", "U01FHQJMH9C"],    # John, Chris, Eddie
+    "web": ["U01VC13DAUT", "U07A66M08CV",  "U01FHQJMH9C"], # Chris, Alexis, Eddie
     "media": ["U01VC13DAUT", "U07A66M08CV", "U01FHQJMH9C"], # Chris, Alexis, Eddie
 }
 

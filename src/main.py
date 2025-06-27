@@ -50,7 +50,7 @@ def run():
 
         # Append detailed alert messages if status is CRITICAL or WARNING
         if result["status"] in ["CRITICAL 🚨", "WARNING ❗️"]:
-            alert_messages.append(format_alert_details(feed["label"], result))
+            alert_messages.append(format_alert_details(key, result))
 
          
     # Slack message construction

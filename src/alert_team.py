@@ -13,7 +13,10 @@ def send_alert_to_team(webhook_url, alert_message):
     """
 
     headers = {'Content-Type': 'application/json'}
-    payload = {"text": alert_message}
+    payload = {
+        "text": alert_message,
+        "mrkdwn": True
+        }
 
     response = requests.post(webhook_url, data=json.dumps(payload), headers=headers)
     
@@ -47,7 +50,10 @@ def format_alert_details(feed_label, result):
         str: A formatted string containing the alert details.
     """
 
-    lines = [f"*Feed:* {feed_label}"]
+    lines = [f"*Feed:* {FEEDS[feed_label]['label']}"]
+    user_mentions = " ".join(f"<@{uid}>" for uid in ALERT_RECIPIENTS.get(feed_label, []))
+    if user_mentions:
+        lines.append(user_mentions)
     lines.append("\n===== ANALYSIS RESULT =====")
     lines.append(f"Status: {result['status']}")
     lines.append(f"Expected Date: {result['date']}")
@@ -59,18 +65,15 @@ def format_alert_details(feed_label, result):
        for issue in result['issues']:
            lines.append(f" - {issue}")
 
-    # Warning Analysis 
-    if result["status"] == "WARNING ❗️":
-        user_mentions = " ".join(f"<@{uid}>" for uid in ALERT_RECIPIENTS.get(feed_label, []))
-        lines.append(user_mentions)
-        lines.append(f"🚨 *CRITICAL ALERT for {feed_label}* 🚨\n{result}")
-    # Critical Analysis
-    if result["status"] == "CRITICAL 🚨":
-        user_mentions = " ".join(f"<@{uid}>" for uid in ALERT_RECIPIENTS.get(feed_label, []))
-        lines.append(user_mentions)
-        lines.append(f"🚨 *CRITICAL ALERT for {feed_label}* 🚨\n{result}")
-
-    else:
-        lines.append("No anomalies detected.")
+    # # Warning Analysis 
+    # if result["status"] == "WARNING ❗️":
+    #     user_mentions = " ".join(f"<@{uid}>" for uid in ALERT_RECIPIENTS.get(feed_label, []))
+    #     lines.append(user_mentions)
+    # # Critical Analysis
+    # elif result["status"] == "CRITICAL 🚨":
+    #     user_mentions = " ".join(f"<@{uid}>" for uid in ALERT_RECIPIENTS.get(feed_label, []))
+    #     lines.append(user_mentions)
+    # else:
+    #     lines.append("No anomalies detected.")
 
     return "\n".join(lines)
