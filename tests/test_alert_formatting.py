@@ -3,7 +3,7 @@ from src.analyzer import analyze_feed
 from src.bq_client import query_historical_baseline
 from src.config import FEEDS, ALERT_RECIPIENTS
 from src.alert_team import format_alert_details, format_overview_table, send_alert_to_team
-from dotenv import load_dotenv
+from dotenv import load_dotenv # type: ignore
 load_dotenv()  # Load environment variables from .env file
 import os
 
