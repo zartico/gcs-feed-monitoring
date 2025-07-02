@@ -5,14 +5,19 @@ from src.alert_team import send_alert_to_team, format_overview_table, format_ale
 from src.config import FEEDS, ALERT_RECIPIENTS
 from datetime import date, timedelta
 from collections import defaultdict
-from dotenv import load_dotenv
-load_dotenv()  # Load environment variables from .env file
 import os
 
 
-SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")
+#SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")
 
-def run():
+# Reconfigure run to take in slack webhook as arg, if none fetch from env variables, set default to NONE
+
+def run(slack_webhook_url=None):
+
+    if slack_webhook_url is None:
+        from dotenv import load_dotenv
+        load_dotenv()  # Load environment variables from .env file
+        slack_webhook_url = os.getenv("SLACK_WEBHOOK_URL")
 
     actual_date = date.today() - timedelta(days=6) # Analysis target date
     upsert_start = date.today() - timedelta(days=13)  # Start date for upsert
@@ -64,7 +69,9 @@ def run():
 
     full_message = "\n".join(message_parts)
     print(full_message)
-    send_alert_to_team(SLACK_WEBHOOK_URL, full_message)
+
+    if slack_webhook_url:
+        send_alert_to_team(slack_webhook_url, full_message)
 
 if __name__ == "__main__":
     run()
