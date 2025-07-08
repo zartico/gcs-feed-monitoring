@@ -1,7 +1,7 @@
 # import packages
 from google.cloud import storage
 from datetime import datetime
-from src.utils import extract_actual_date
+from utils import extract_actual_date
 
 def list_gcs_metadata(bucket_name, prefix = "", debug = False): 
     """

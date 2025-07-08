@@ -34,3 +34,5 @@ PROJECT_ID = "your-gcp-project-id"
 DATASET_ID = "your_dataset_name"
 TABLE_ID = "your_table_name"
 
+# Looker Studio report link
+LOOKER_LINK = "https://lookerstudio.google.com/reporting/your-report-id"

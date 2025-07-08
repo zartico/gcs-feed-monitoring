@@ -26,3 +26,5 @@ ALERT_RECIPIENTS = {
 PROJECT_ID = "prj-prod-gd-api-load-t51k"
 DATASET_ID = "AziraMonitoring"
 TABLE_ID = "raw_data_monitoring"
+
+LOOKER_LINK = "https://lookerstudio.google.com/reporting/08b46e60-9784-4bd4-a8da-db0cbad8db81"

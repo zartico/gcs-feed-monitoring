@@ -1,6 +1,6 @@
 import requests
 import json
-from src.config import FEEDS, ALERT_RECIPIENTS
+from config import FEEDS, ALERT_RECIPIENTS, LOOKER_LINK
 from tabulate import tabulate
 
 def send_alert_to_team(webhook_url, alert_message):
@@ -36,7 +36,8 @@ def format_overview_table(results: list[tuple[str, str, str]]) -> str:
 
     header = ["Feed", "Status", "Expected Date"]
     table = tabulate(results, headers=header, tablefmt="grid", stralign="left", numalign="left")
-    return f"```\n{table}\n```"
+    looker_line = f"\n 📈 <{LOOKER_LINK}|View Historical Trends in Looker Studio>"
+    return f"```\n{table}\n```{looker_line}"
 
 def format_alert_details(feed_label, result):
     """    
@@ -60,20 +61,10 @@ def format_alert_details(feed_label, result):
     lines.append(f"File Count: {result['file_count']} (Baseline: {result['monthly_avg_count']:.1f})")
     lines.append(f"Size: {result['file_size_mb']:.2f} MB (Baseline: {result['monthly_avg_size_mb']:.2f} MB)")
 
+    # Append details of issues if any
     if result['issues']:
        lines.append("Issues Detected:")
        for issue in result['issues']:
            lines.append(f" - {issue}")
-
-    # # Warning Analysis 
-    # if result["status"] == "WARNING ❗️":
-    #     user_mentions = " ".join(f"<@{uid}>" for uid in ALERT_RECIPIENTS.get(feed_label, []))
-    #     lines.append(user_mentions)
-    # # Critical Analysis
-    # elif result["status"] == "CRITICAL 🚨":
-    #     user_mentions = " ".join(f"<@{uid}>" for uid in ALERT_RECIPIENTS.get(feed_label, []))
-    #     lines.append(user_mentions)
-    # else:
-    #     lines.append("No anomalies detected.")
 
     return "\n".join(lines)

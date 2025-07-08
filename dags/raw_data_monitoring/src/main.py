@@ -1,23 +1,20 @@
-from src.gcs_client import list_gcs_metadata
-from src.bq_client import upsert_feed_metrics
-from src.analyzer import analyze_feed
-from src.alert_team import send_alert_to_team, format_overview_table, format_alert_details
-from src.config import FEEDS, ALERT_RECIPIENTS
+from gcs_client import list_gcs_metadata
+from bq_client import upsert_feed_metrics
+from analyzer import analyze_feed
+from alert_team import send_alert_to_team, format_overview_table, format_alert_details
+from config import FEEDS, ALERT_RECIPIENTS
 from datetime import date, timedelta
 from collections import defaultdict
 import os
 
 
-#SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")
+# Run takes in slack webhook as arg, if none fetch from env variables, set default to NONE
+def run(slack_webhook=None):
 
-# Reconfigure run to take in slack webhook as arg, if none fetch from env variables, set default to NONE
-
-def run(slack_webhook_url=None):
-
-    if slack_webhook_url is None:
+    if slack_webhook is None:
         from dotenv import load_dotenv
         load_dotenv()  # Load environment variables from .env file
-        slack_webhook_url = os.getenv("SLACK_WEBHOOK_URL")
+        slack_webhook = os.getenv("SLACK_WEBHOOK_URL")
 
     actual_date = date.today() - timedelta(days=6) # Analysis target date
     upsert_start = date.today() - timedelta(days=13)  # Start date for upsert
@@ -70,8 +67,8 @@ def run(slack_webhook_url=None):
     full_message = "\n".join(message_parts)
     print(full_message)
 
-    if slack_webhook_url:
-        send_alert_to_team(slack_webhook_url, full_message)
+    if slack_webhook:
+        send_alert_to_team(slack_webhook, full_message)
 
 if __name__ == "__main__":
     run()

@@ -1,7 +1,11 @@
 from datetime import date, timedelta
-from src.analyzer import analyze_feed
-from src.bq_client import query_historical_baseline
-from src.config import FEEDS, ALERT_RECIPIENTS
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../dags/raw_data_monitoring/src')))
+
+from analyzer import analyze_feed
+from bq_client import query_historical_baseline
+from config import FEEDS, ALERT_RECIPIENTS
 
 def make_file(size_mb, actual_date):
     return {"size": size_mb * 1_000_000, "actual_date": actual_date}
@@ -19,7 +23,7 @@ def test_analyze_feed_ok(monkeypatch):
     file_metadata.extend([make_file(100, today) for _ in range(10)])
 
     # Patch query_historical_baseline to return baseline
-    monkeypatch.setattr("src.analyzer.query_historical_baseline", lambda *a, **kw: (10, 1000))
+    monkeypatch.setattr("analyzer.query_historical_baseline", lambda *a, **kw: (10, 1000))
     result = analyze_feed("TestFeed", file_metadata, today)
     assert result["status"] == "OK ✅"
 
@@ -28,7 +32,7 @@ def test_analyze_feed_critical(monkeypatch):
     today = date.today()
     file_metadata = []
     # Patch baseline
-    monkeypatch.setattr("src.analyzer.query_historical_baseline", lambda *a, **kw: (10, 100))
+    monkeypatch.setattr("analyzer.query_historical_baseline", lambda *a, **kw: (10, 100))
     result = analyze_feed("TestFeed", file_metadata, today)
     assert result["status"] == "CRITICAL 🚨"
     assert "No data received." in result["issues"]
@@ -43,7 +47,7 @@ def test_analyze_feed_warning_count(monkeypatch):
         file_metadata.extend([make_file(100, d) for _ in range(10)])
     # Today: 5 files (50% less)
     file_metadata.extend([make_file(100, today) for _ in range(5)])
-    monkeypatch.setattr("src.analyzer.query_historical_baseline", lambda *a, **kw: (10, 100))
+    monkeypatch.setattr("analyzer.query_historical_baseline", lambda *a, **kw: (10, 100))
     result = analyze_feed("TestFeed", file_metadata, today)
     assert result["status"] == "WARNING ❗️"
     assert any("File count deviates" in issue for issue in result["issues"])
@@ -58,7 +62,7 @@ def test_analyze_feed_warning_size(monkeypatch):
         file_metadata.extend([make_file(100, d) for _ in range(10)])
     # Today: 10 files, 50MB each (size deviation)
     file_metadata.extend([make_file(50, today) for _ in range(10)])
-    monkeypatch.setattr("src.analyzer.query_historical_baseline", lambda *a, **kw: (10, 100))
+    monkeypatch.setattr("analyzer.query_historical_baseline", lambda *a, **kw: (10, 100))
     result = analyze_feed("TestFeed", file_metadata, today)
     assert result["status"] == "WARNING ❗️"
     assert any("Size deviates" in issue for issue in result["issues"])
@@ -73,7 +77,7 @@ def test_analyze_feed_warning_both(monkeypatch):
         file_metadata.extend([make_file(100, d) for _ in range(10)])
     # Today: 5 files, 40MB each
     file_metadata.extend([make_file(40, today) for _ in range(5)])
-    monkeypatch.setattr("src.analyzer.query_historical_baseline", lambda *a, **kw: (10, 100))
+    monkeypatch.setattr("analyzer.query_historical_baseline", lambda *a, **kw: (10, 100))
     result = analyze_feed("TestFeed", file_metadata, today)
     assert result["status"] == "WARNING ❗️"
     assert len(result["issues"]) == 2

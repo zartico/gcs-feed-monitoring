@@ -1,7 +1,7 @@
 from google.cloud import bigquery
 from google.api_core.exceptions import NotFound
 from datetime import date 
-from src.config import PROJECT_ID, DATASET_ID, TABLE_ID
+from config import PROJECT_ID, DATASET_ID, TABLE_ID
 
 client = bigquery.Client(project = PROJECT_ID)
 
@@ -126,8 +126,7 @@ def query_historical_baseline(feed_label: str, start_date: date, end_date: date)
 
     row = next(result, None)
     if row:
-        #print(row[0], row[1])
-        return row[0], row[1] # average file count and size in MB
+        return row[0], row[1] # Average file count and size in MB
     else:
         print(f"[WARN] No historical data for {feed_label} between {start_date} and {end_date}")
         return 0.0, 0.0
