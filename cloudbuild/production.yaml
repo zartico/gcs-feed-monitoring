@@ -1,0 +1,11 @@
+steps:
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:alpine'
+    args:
+      - '-c'
+      - >-
+        echo "$BRANCH_NAME DEPLOYING";
+        gsutil -m cp -r ./dags/raw_data_monitoring/; gs://gd-prod-airflow/dags;
+    id: Deploy
+    entrypoint: bash
+options:
+  logging: CLOUD_LOGGING_ONLY

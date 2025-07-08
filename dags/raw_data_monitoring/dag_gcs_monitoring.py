@@ -10,7 +10,7 @@ sys.path.append("/home/airflow/gcs/dags/raw_data_monitoring/src")
 
 @dag(
     dag_id="gcs_feed_monitoring",
-    schedule=None,
+    schedule=  "0 4 * * *", # 4 AM UTC - 10 PM UTC
     start_date=datetime.now(pytz.timezone("US/Central")) - timedelta(days=10),
     catchup=False,
     tags=["raw-data-monitoring", "gcs", "slack"],
