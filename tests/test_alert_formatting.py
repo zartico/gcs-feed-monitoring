@@ -37,8 +37,8 @@ def test_slack_message_format(monkeypatch):
     ])
 
     # Send to Slack (mocked in tests)
-    #slack_webhook_url = os.getenv("SLACK_WEBHOOK_URL")
-    #send_alert_to_team(slack_webhook_url, full_message)
+    slack_webhook_url = os.getenv("SLACK_WEBHOOK_URL")
+    send_alert_to_team(slack_webhook_url, full_message)
     print(full_message)
 
     print("Test alert for Web Impressions sent successfully.")

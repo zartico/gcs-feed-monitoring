@@ -4,7 +4,7 @@ steps:
       - '-c'
       - >-
         echo "$BRANCH_NAME DEPLOYING";
-        gsutil -m cp -r ./dags/raw_data_monitoring/; gs://gd-prod-airflow/dags;
+        gsutil -m cp -r ./dags/raw_data_monitoring/ gs://gd-prod-airflow/dags/;
     id: Deploy
     entrypoint: bash
 options:
